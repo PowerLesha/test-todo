@@ -1,24 +1,40 @@
+// slices/taskSlice.js
+
 import { createSlice } from "@reduxjs/toolkit";
+import { v4 as uuidv4 } from "uuid";
 
 const initialState = {
-  tasks: [],
-  // other initial state properties if needed
+  taskLists: [],
 };
 
 const taskSlice = createSlice({
   name: "tasks",
   initialState,
   reducers: {
-    addTask(state, action) {
-      state.tasks.push(action.payload);
-    },
     addTaskList(state, action) {
-      state.tasks.push({ title: action.payload, tasks: [] }); // Add a new task list with an empty array of tasks
+      state.taskLists.push({ id: uuidv4(), title: action.payload, tasks: [] });
     },
-    // add other reducers for updating task status, filtering, etc.
+    addTaskToList(state, action) {
+      const { listId, task } = action.payload;
+      const list = state.taskLists.find((list) => list.id === listId);
+      if (list) {
+        list.tasks.push({ ...task, id: uuidv4() });
+      }
+    },
+    toggleTaskStatus(state, action) {
+      const { listId, taskId } = action.payload;
+      const taskList = state.taskLists.find((list) => list.id === listId);
+      if (taskList) {
+        const task = taskList.tasks.find((task) => task.id === taskId);
+        if (task) {
+          task.isDone = !task.isDone;
+        }
+      }
+    },
   },
 });
 
-export const { addTask, addTaskList } = taskSlice.actions;
+export const { addTaskList, addTaskToList, toggleTaskStatus } =
+  taskSlice.actions;
 
 export default taskSlice.reducer;

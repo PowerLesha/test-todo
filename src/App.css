@@ -4,6 +4,72 @@
   padding: 2rem;
   text-align: center;
 }
+@media (max-width: 767px) {
+  .lists {
+    flex: 0 0 100%;
+  }
+}
+.main-form {
+}
+.form-check {
+  margin-left: 100px;
+  display: inline;
+  justify-content: center;
+  height: 40px;
+  width: 100px;
+}
+input.form-check-input {
+  padding-top: 10px;
+  display: inline;
+}
+input {
+  box-shadow: 0 0 20px rgba(250, 7, 7, 0.2);
+  margin: 5px;
+  height: 30px;
+  border-radius: 8px;
+}
+input.main-form-control {
+  width: 200px;
+}
+input.main-form-control::placeholder {
+  transform: translateX(22%);
+}
+
+.lists-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between; /* Adjust alignment as needed */
+  margin: 50px;
+}
+
+.lists {
+  width: 300px; /* Adjust width as needed */
+  margin-bottom: 20px;
+  margin: 10px;
+  justify-content: center;
+}
+input::placeholder {
+  transform: translateX(14%);
+}
+.list-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.tasks {
+  margin-top: 10px;
+}
+
+.list-buttons {
+  margin-top: 10px;
+  width: 300px;
+  margin-left: 20px;
+}
+.list-buttons button {
+  margin-right: 4px; /* Adjust the value as needed */
+}
+
+/* Add more CSS rules as needed */
 
 .logo {
   height: 6em;

@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Form, Col, ListGroup, Row, Container } from "react-bootstrap";
+import { FaTimes, FaTrashAlt } from "react-icons/fa";
+
 import {
   addTaskList,
   addTaskToList,
+  removeTask,
+  removeTaskList,
   toggleTaskStatus,
 } from "../../slices/taskSlice";
 
@@ -12,10 +16,10 @@ const AddListForm = () => {
   const [newTaskTitles, setNewTaskTitles] = useState({});
   const [filters, setFilters] = useState({});
   const [taskCountText, setTaskCountText] = useState({});
-  const [emptyInputSubmitted, setEmptyInputSubmitted] = useState(false); // State to track if empty input is submitted for list
+  const [emptyInputSubmitted, setEmptyInputSubmitted] = useState(false);
   const [emptySecondInputSubmitted, setEmptySecondInputSubmitted] = useState(
     {}
-  ); // State to track if empty input is submitted for task
+  );
   const dispatch = useDispatch();
   const taskLists = useSelector((state) => state.tasks.taskLists);
 
@@ -55,7 +59,7 @@ const AddListForm = () => {
       setNewListTitle("");
       setEmptyInputSubmitted(false);
     } else {
-      setEmptyInputSubmitted(true); // Set state to true if empty input is submitted
+      setEmptyInputSubmitted(true);
     }
   };
 
@@ -97,6 +101,17 @@ const AddListForm = () => {
       return tasks;
     }
   };
+  const handleRemoveTask = (listId, taskId) => {
+    if (window.confirm("Are you sure you want to delete this task?")) {
+      dispatch(removeTask({ listId, taskId }));
+    }
+  };
+
+  const handleRemoveTaskList = (listId) => {
+    if (window.confirm("Are you sure you want to delete this task list?")) {
+      dispatch(removeTaskList({ listId }));
+    }
+  };
 
   return (
     <Container>
@@ -114,10 +129,9 @@ const AddListForm = () => {
                   emptyInputSubmitted && !listTitle.trim() ? "red" : "",
               }}
             />
-            {emptyInputSubmitted &&
-              !listTitle.trim() && ( // Show message if empty input is submitted for list
-                <p style={{ color: "red" }}>List title cannot be empty</p>
-              )}
+            {emptyInputSubmitted && !listTitle.trim() && (
+              <p style={{ color: "red" }}>List title cannot be empty</p>
+            )}
           </Col>
           <Col>
             <Button type="submit">Add Task List</Button>
@@ -138,7 +152,16 @@ const AddListForm = () => {
             }}
           >
             <div className="list-form">
-              <h3>{taskList.title}</h3>
+              <div className="header-list">
+                <h3>{taskList.title}</h3>
+                <span
+                  title="delete list?"
+                  className="delete-icon"
+                  onClick={() => handleRemoveTaskList(taskList.id)}
+                >
+                  <FaTrashAlt />
+                </span>
+              </div>
               <Form onSubmit={(e) => handleSubmitTask(e, taskList.id)}>
                 <Col>
                   <Form.Control
@@ -165,6 +188,7 @@ const AddListForm = () => {
                 </Col>
               </Form>
             </div>
+
             <div className="tasks">
               <ListGroup>
                 {filteredTasks(
@@ -203,6 +227,14 @@ const AddListForm = () => {
                           }}
                         >
                           {task.title}
+                          <span
+                            className="delete-task-icon"
+                            onClick={() =>
+                              handleRemoveTask(taskList.id, task.id)
+                            }
+                          >
+                            <FaTimes />
+                          </span>
                         </span>
                       }
                     />

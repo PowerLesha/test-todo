@@ -31,10 +31,26 @@ const taskSlice = createSlice({
         }
       }
     },
+    removeTask(state, action) {
+      const { listId, taskId } = action.payload;
+      const taskList = state.taskLists.find((list) => list.id === listId);
+      if (taskList) {
+        taskList.tasks = taskList.tasks.filter((task) => task.id !== taskId);
+      }
+    },
+    removeTaskList(state, action) {
+      const { listId } = action.payload;
+      state.taskLists = state.taskLists.filter((list) => list.id !== listId);
+    },
   },
 });
 
-export const { addTaskList, addTaskToList, toggleTaskStatus } =
-  taskSlice.actions;
+export const {
+  addTaskList,
+  addTaskToList,
+  toggleTaskStatus,
+  removeTask,
+  removeTaskList,
+} = taskSlice.actions;
 
 export default taskSlice.reducer;

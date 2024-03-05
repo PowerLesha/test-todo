@@ -9,8 +9,7 @@
     flex: 0 0 100%;
   }
 }
-.main-form {
-}
+
 .form-check {
   margin-left: 100px;
   display: inline;
@@ -88,8 +87,6 @@ input::placeholder {
 }
 .list-buttons button {
   margin-right: 4px; /* Adjust the value as needed */
-}
-.list-group {
 }
 
 /* Add more CSS rules as needed */

@@ -57,7 +57,9 @@ input.main-form-control::placeholder {
   justify-content: space-between; /* Adjust alignment as needed */
   margin: 10px;
 }
-
+.edit-icon {
+  margin-top: 20px;
+}
 .lists {
   width: 310px; /* Adjust width as needed */
   margin-bottom: 20px;

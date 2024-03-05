@@ -14,6 +14,8 @@ import {
 const AddListForm = () => {
   const [listTitle, setNewListTitle] = useState("");
   const [newTaskTitles, setNewTaskTitles] = useState({});
+  const [editListId, setEditListId] = useState(null);
+  const [editedListTitle, setEditedListTitle] = useState("");
   const [filters, setFilters] = useState({});
   const [taskCountText, setTaskCountText] = useState({});
   const [emptyInputSubmitted, setEmptyInputSubmitted] = useState(false);
@@ -41,7 +43,18 @@ const AddListForm = () => {
         }
       })();
     };
+    const handleEditList = (listId, title) => {
+      setEditListId(listId);
+      setEditedListTitle(title);
+    };
 
+    const handleSaveList = () => {
+      if (editedListTitle.trim() !== "") {
+        dispatch(saveList({ listId: editListId, title: editedListTitle }));
+        setEditListId(null);
+        setEditedListTitle("");
+      }
+    };
     const updatedTaskCountText = {};
     taskLists.forEach((taskList) => {
       updatedTaskCountText[taskList.id] = getTaskCountText(
@@ -148,7 +161,7 @@ const AddListForm = () => {
               padding: "10px",
               paddingRight: "30px",
               marginBottom: "10px",
-              boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.3)", // Increased shadow
+              boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.3)",
             }}
           >
             <div className="list-form">
@@ -179,7 +192,7 @@ const AddListForm = () => {
                   />
                   {emptySecondInputSubmitted[taskList.id] &&
                     (!newTaskTitles[taskList.id]?.trim() ||
-                      newTaskTitles[taskList.id]?.trim() === "") && ( // Show message if empty input is submitted for task
+                      newTaskTitles[taskList.id]?.trim() === "") && (
                       <p style={{ color: "red" }}>Task title cannot be empty</p>
                     )}
                 </Col>

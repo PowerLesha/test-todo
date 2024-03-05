@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Form, Col, ListGroup, Row, Container } from "react-bootstrap";
 import {
@@ -11,14 +11,51 @@ const AddListForm = () => {
   const [listTitle, setNewListTitle] = useState("");
   const [newTaskTitles, setNewTaskTitles] = useState({});
   const [filters, setFilters] = useState({});
+  const [taskCountText, setTaskCountText] = useState({});
+  const [emptyInputSubmitted, setEmptyInputSubmitted] = useState(false); // State to track if empty input is submitted for list
+  const [emptySecondInputSubmitted, setEmptySecondInputSubmitted] = useState(
+    {}
+  ); // State to track if empty input is submitted for task
   const dispatch = useDispatch();
   const taskLists = useSelector((state) => state.tasks.taskLists);
+
+  useEffect(() => {
+    const getTaskCountText = (tasks, filter) => {
+      const count = filteredTasks(tasks, filter).length;
+
+      return (() => {
+        if (filter !== "all" && count > 1) {
+          return `You have ${count} ${filter} tasks`;
+        } else if (filter !== "all" && count === 1) {
+          return `You have ${count} ${filter} task`;
+        } else if (filter && count === 0) {
+          return "You don't have any tasks";
+        } else if (filter === "all" && count > 1) {
+          return `You have ${count} tasks`;
+        } else {
+          return `You have ${count} task`;
+        }
+      })();
+    };
+
+    const updatedTaskCountText = {};
+    taskLists.forEach((taskList) => {
+      updatedTaskCountText[taskList.id] = getTaskCountText(
+        taskList.tasks,
+        filters[taskList.id] || "all"
+      );
+    });
+    setTaskCountText(updatedTaskCountText);
+  }, [taskLists, filters]);
 
   const handleSubmitList = (e) => {
     e.preventDefault();
     if (listTitle.trim() !== "") {
       dispatch(addTaskList(listTitle));
       setNewListTitle("");
+      setEmptyInputSubmitted(false);
+    } else {
+      setEmptyInputSubmitted(true); // Set state to true if empty input is submitted
     }
   };
 
@@ -30,6 +67,15 @@ const AddListForm = () => {
         addTaskToList({ listId, task: { title: taskTitle, isDone: false } })
       );
       setNewTaskTitles({ ...newTaskTitles, [listId]: "" });
+      setEmptySecondInputSubmitted({
+        ...emptySecondInputSubmitted,
+        [listId]: false,
+      });
+    } else {
+      setEmptySecondInputSubmitted({
+        ...emptySecondInputSubmitted,
+        [listId]: true,
+      }); // Set state to true if empty input is submitted
     }
   };
 
@@ -63,7 +109,15 @@ const AddListForm = () => {
               placeholder="Enter new list title"
               value={listTitle}
               onChange={(e) => setNewListTitle(e.target.value)}
+              style={{
+                borderColor:
+                  emptyInputSubmitted && !listTitle.trim() ? "red" : "",
+              }}
             />
+            {emptyInputSubmitted &&
+              !listTitle.trim() && ( // Show message if empty input is submitted for list
+                <p style={{ color: "red" }}>List title cannot be empty</p>
+              )}
           </Col>
           <Col>
             <Button type="submit">Add Task List</Button>
@@ -72,7 +126,17 @@ const AddListForm = () => {
       </Col>
       <Row className="lists-container">
         {taskLists.map((taskList) => (
-          <Col key={taskList.id} className="lists">
+          <Col
+            key={taskList.id}
+            className="lists"
+            style={{
+              border: "1px solid black",
+              padding: "10px",
+              paddingRight: "30px",
+              marginBottom: "10px",
+              boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.3)", // Increased shadow
+            }}
+          >
             <div className="list-form">
               <h3>{taskList.title}</h3>
               <Form onSubmit={(e) => handleSubmitTask(e, taskList.id)}>
@@ -82,7 +146,19 @@ const AddListForm = () => {
                     placeholder="Enter new task title"
                     value={newTaskTitles[taskList.id] || ""}
                     onChange={(e) => handleTaskTitleChange(e, taskList.id)}
+                    style={{
+                      borderColor:
+                        emptySecondInputSubmitted[taskList.id] &&
+                        !newTaskTitles[taskList.id]?.trim()
+                          ? "red"
+                          : "",
+                    }}
                   />
+                  {emptySecondInputSubmitted[taskList.id] &&
+                    (!newTaskTitles[taskList.id]?.trim() ||
+                      newTaskTitles[taskList.id]?.trim() === "") && ( // Show message if empty input is submitted for task
+                      <p style={{ color: "red" }}>Task title cannot be empty</p>
+                    )}
                 </Col>
                 <Col>
                   <Button type="submit">Add Task</Button>
@@ -122,6 +198,8 @@ const AddListForm = () => {
                               ? "line-through"
                               : "none",
                             cursor: "pointer",
+                            position: "absolute",
+                            marginTop: "6px",
                           }}
                         >
                           {task.title}
@@ -131,6 +209,17 @@ const AddListForm = () => {
                   </ListGroup.Item>
                 ))}
               </ListGroup>
+              <div
+                className="task-count"
+                style={{
+                  borderBottom: "1px solid black",
+                  borderTop: "1px solid black",
+                  width: "113.5%",
+                  marginLeft: "-11px",
+                }}
+              >
+                {taskCountText[taskList.id]}
+              </div>
             </div>
             <div className="list-buttons">
               <Button onClick={() => handleFilterChange(taskList.id, "all")}>
